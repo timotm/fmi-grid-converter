@@ -1,0 +1,23 @@
+{
+  "name": "fmi-grid-converter",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "go test ./pkg/...",
+    "start": "yarn vercel dev"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/timotm/fmi-grid-converter.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/timotm/fmi-grid-converter/issues"
+  },
+  "homepage": "https://github.com/timotm/fmi-grid-converter#readme",
+  "dependencies": {
+    "vercel": "^28.1.0"
+  }
+}
