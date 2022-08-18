@@ -1,18 +1,20 @@
 package parse
 
 import (
+	"bytes"
 	"fmt"
 	"log"
+	"strings"
 	"time"
 
 	"github.com/amsokol/go-grib2"
 )
 
 type ForecastItem struct {
-	Temperature   float32 `json:"temperature"`
-	WindSpeed     float32 `json:"windSpeed"`
-	WindDirection int     `json:"windDirection"`
-	Precipitation float32 `json:"precipitation"`
+	Temperature   float32 `json:"t"`
+	WindSpeed     float32 `json:"ws"`
+	WindDirection int     `json:"wd"`
+	Precipitation float32 `json:"p"`
 }
 
 type ForecastKey struct {
@@ -25,6 +27,29 @@ func (f ForecastKey) MarshalText() ([]byte, error) {
 }
 
 type Forecast map[ForecastKey]map[time.Time]ForecastItem
+
+func (f Forecast) ToJson() ([]byte, error) {
+	buf := &bytes.Buffer{}
+	if _, err := buf.WriteString(`{"locations": [`); err != nil {
+		return nil, err
+	}
+	locations := []string{}
+	for k := range f {
+		forecasts := []string{}
+		for t, v := range f[k] {
+			forecasts = append(forecasts, fmt.Sprintf(`{"ts": "%s", "t": %.1f, "ws": %.1f, "wd": %d, "p": %.1f}`, t.Format(time.RFC3339), v.Temperature, v.WindSpeed, v.WindDirection, v.Precipitation))
+		}
+		locations = append(locations, fmt.Sprintf(`{"lat": %f, "lon": %f, "forecasts": [%s]}`, k.lat, k.lon, strings.Join(forecasts, ", ")))
+	}
+
+	if _, err := buf.WriteString(strings.Join(locations, ", ")); err != nil {
+		return nil, err
+	}
+	if _, err := buf.WriteString("]}"); err != nil {
+		return nil, err
+	}
+	return buf.Bytes(), nil
+}
 
 func Parse(input []byte) (Forecast, error) {
 	gribs, err := grib2.Read(input)
