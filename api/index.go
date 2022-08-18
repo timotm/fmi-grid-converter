@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -81,7 +80,7 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	output, err := json.Marshal(forecast)
+	output, err := forecast.ToJson()
 	if err != nil {
 		log.Printf("Error marshalling data: %s", err.Error())
 		http.Error(w, err.Error(), http.StatusInternalServerError)
